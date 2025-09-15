@@ -42,7 +42,7 @@ pULL <- function(q, mu, sigma, lower.tail = TRUE, log.p = FALSE) {
 }
 
 
-qULL <- function(p, mu, lower.tail = TRUE, log.p = FALSE) {
+qULL <- function(p, mu, sigma, lower.tail = TRUE, log.p = FALSE) {
   if (any(p <= 0 | p >= 1)) stop("p must be in the interval (0, 1)")
   if (any(mu < 0))        stop("mu must be positive")
   if (any(sigma <= 0))    stop("sigma must be positive")
@@ -61,7 +61,7 @@ qULL <- function(p, mu, lower.tail = TRUE, log.p = FALSE) {
   }
   # End auxiliary function
   
-  res <- uniroot(aux_fun, interval=c(0, 1),
+  res <- uniroot(aux_fun, interval=c(.Machine$double.eps, 1 - .Machine$double.eps),
                  p=p, mu=mu, sigma=sigma)$root
   
   return(res)
@@ -70,7 +70,7 @@ qULL <- Vectorize(qULL)
 
 
 rULL <- function(n, mu, sigma) {
-  if (any(mu <= 0)) stop("parameter mu must be positive!")
+  if (any(mu < 0)) stop("parameter mu must be positive!")
   if (any(sigma <= 0)) stop("parameter sigma must be positive!")
   u <- runif(n)
   qULL(u, mu, sigma)
